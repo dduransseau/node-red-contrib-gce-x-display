@@ -1,0 +1,88 @@
+<script type="text/x-red" data-template-name="xdisplay-mqtt-update-type">
+    <div class="form-row">
+        <label for="node-input-name" class="l-width">Name</label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]placeholder.name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-broker" class="l-width">X-Display</label>
+        <input type="text" id="node-input-broker">
+    </div>
+    <div class="form-row">
+        <label for="node-input-screenType">Type</label>
+        <input type="text" id="node-input-screenType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-screen">Ecran</label>
+        <input type="number" id="node-input-screen">
+    </div>
+</script>
+
+<script type='text/javascript'>
+
+    const screenTypeMapping = {
+        "0": "Thermostat",
+        "1": "Bouton",
+        "2": "Maison",
+        "3": "Volet",
+        "5": "Veilleuse",
+        "6": "Température",
+        "7": "Humidité",
+        "8": "Luminosité",
+        "9": "4 Boutons",
+        "10": "Jauge",
+        "11": "Lecteur"
+    }
+
+    RED.nodes.registerType('xdisplay-mqtt-update-type', {
+        category: 'GCE X\u2013Display',
+        color: '#80c600',
+        icon: "font-awesome/fa-microchip",
+        defaults: {
+            name: {
+                value: ""
+            },
+            broker: {
+                type: "gateway",
+                required: true
+            },
+            screenType: { value:"1"},
+            screen: {value:0, validate:RED.validators.number()}
+        },
+        inputs: 1,
+        outputs: 0,
+        // outputLabels: ["value"],
+        paletteLabel: 'Update type',
+        label: function () {
+            var label = 'X\u2013Display update type';
+            if (this.name) {
+                label = this.name;
+            } else if (this.screenType){
+                return "X\u2013Display set "+screenTypeMapping[this.screenType]
+            }
+            return label;
+        },
+        oneditprepare: function() {
+			$("#node-input-screenType").typedInput({
+				types: [
+					{
+						value: "1",
+						options: [
+                            { value: "0", label: screenTypeMapping["0"]},
+							{ value: "1", label: screenTypeMapping["1"]},
+							{ value: "2", label: screenTypeMapping["2"]},
+							{ value: "3", label: screenTypeMapping["3"]},
+                            { value: "5", label: screenTypeMapping["5"]},
+							{ value: "6", label: screenTypeMapping["6"]},
+							{ value: "7", label: screenTypeMapping["7"]},
+                            { value: "8", label: screenTypeMapping["8"]},
+							{ value: "9", label: screenTypeMapping["9"]},
+                            { value: "10", label: screenTypeMapping["10"]},
+							{ value: "11", label: screenTypeMapping["11"]}
+						]
+					}
+				]
+			})
+		}
+    });
+
+</script>

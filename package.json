@@ -1,0 +1,20 @@
+{
+    "name": "@dduransseau/node-red-contrib-gce-x-display",
+    "version": "0.1.0",
+    "description": "Intégration GCE X-Display V2",
+    "author": "Damien Duransseau <damien@duransseau.net>",
+    "license": "MIT",
+    "node-red": {
+        "version": ">=2.1.0",
+        "nodes": {
+            "in": "./src/in.js",
+            "out": "./src/out.js",
+            "update_type": "./src/update_type.js",
+            "update_name": "./src/update_name.js",
+            "gateway": "./src/gateway.js"
+        }
+    },
+    "dependencies": {
+        "mqtt": "^4.3.8"
+    }
+}

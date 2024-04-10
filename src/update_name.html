@@ -1,0 +1,44 @@
+<script type="text/x-red" data-template-name="xdisplay-mqtt-update-name">
+    <div class="form-row">
+        <label for="node-input-name" class="l-width">Name</label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]placeholder.name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-broker" class="l-width">X-Display</label>
+        <input type="text" id="node-input-broker">
+    </div>
+    <div class="form-row">
+        <label for="node-input-screen">Ecran</label>
+        <input type="number" id="node-input-screen">
+    </div>
+</script>
+
+<script type='text/javascript'>
+
+    RED.nodes.registerType('xdisplay-mqtt-update-name', {
+        category: 'GCE X\u2013Display',
+        color: '#80c600',
+        icon: "font-awesome/fa-microchip",
+        defaults: {
+            name: {
+                value: ""
+            },
+            broker: {
+                type: "gateway",
+                required: true
+            },
+            screen: {value:0, validate:RED.validators.number()}
+        },
+        inputs: 1,
+        outputs: 0,
+        // outputLabels: ["value"],
+        paletteLabel: 'Rename screen',
+        label: function () {
+            if (this.name) {
+                return this.name;
+            }
+            return 'X\u2013Display rename screen';
+        }
+    });
+
+</script>
