@@ -1,0 +1,2 @@
+- Garder en cache la liste des screen découverts
+- Traduction anglais/français

@@ -36,11 +36,14 @@ module.exports = function(RED) {
                     value = "1"
                 } else if (value == false){
                     value = "0"
-                } else if (value.toLowerCase() === "on"){
+                } else if (typeof value === 'string' && value.toLowerCase() === "on"){
                     value = "1"
                 } else {
                     value = "0"
                 }
+            }
+            if (typeof value !== "string"){
+                value = value.toString()
             }
 
             // console.log("Send action "+node.config.action+" to display")

@@ -1,20 +1,36 @@
 module.exports = function(RED) {
     class xDisplayMqttIn {
+
+        subGlobalTopic = ["/temp"]
+        subScreenActionList = ["/ThState", "/ThMeasureState", "/IoState",
+                                    "/temp", "/hum", "/lum",
+                                    "/IoBtn1State", "/IoBtn2State", "/IoBtn3State", "/IoBtn4State",
+                                    "/SliderValueState", "/SliderBtnState",
+                                    "/PlayerMuteState", "/PlayerPauseState", "/PlayerRandomState", "/PlayerLoopState"]
+
         constructor(config) {
             RED.nodes.createNode(this, config);
 
             let node = this;
-            node.config = config;
-            node.firstMsg = true;
-            node.cleanTimer = null;
-            node.broker = RED.nodes.getNode(node.config.broker);
-            node.last_value = null;
-            node.last_successful_status = {};
-            node.status({});
 
+            node.config = config;
+            node.broker = RED.nodes.getNode(node.config.broker);
+            node.filterCommand = config.filterCommand;
+            node.last_successful_status = {};
+            node.status(node.last_successful_status);
+            // console.log("Node X-Display in config: "+JSON.stringify(config))
             if (node.broker) {
-                // node.listener_onMQTTAvailability = function(data) { node.onMQTTAvailability(data); }
-                // node.broker.on('onMQTTAvailability', node.listener_onMQTTAvailability);
+                node.listener_onMQTTAvailability = function(data) { node.onMQTTAvailability(data); }
+                node.broker.on('onMQTTAvailability', node.listener_onMQTTAvailability);
+                if (node.filterCommand == true){
+                    node.subScreenActionList.forEach((t) => {
+                        // console.log("Subscribe to specific topic: "+ "*/"+t)
+                        node.broker.subscribeTopic("+"+t)
+                    })
+                } else {
+                    // console.log("Subscribe to global topic")
+                    node.broker.subscribeTopic("#")
+                }
 
                 node.listener_onConnectError = function(data) { node.onConnectError(); }
                 node.broker.on('onConnectError', node.listener_onConnectError);
@@ -106,7 +122,6 @@ module.exports = function(RED) {
                 text: "node-red-contrib-xdisplay-mqtt/in:status.no_connection"
             });
         }
-
 
         onClose() {
             let node = this;

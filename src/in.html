@@ -7,6 +7,10 @@
         <label for="node-input-broker" class="l-width">X-Display</label>
         <input type="text" id="node-input-broker">
     </div>
+    <div class="form-row">
+        <label for="node-input-filterCommand" class="l-width">Filter command</label>
+        <input type="checkbox" id="node-input-filterCommand">
+    </div>
 </script>
 
 <script type='text/javascript'>
@@ -22,6 +26,9 @@
                 type: "gce-X-Display",
                 required: true
             },
+            filterCommand: {
+                value: false
+            }
         },
         inputs: 0,
         outputs: 1,
