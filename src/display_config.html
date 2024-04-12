@@ -1,4 +1,4 @@
-<script type="text/x-red" data-template-name="xdisplay-mqtt-out">
+<script type="text/x-red" data-template-name="xdisplay-mqtt-display-config">
     <div class="form-row">
         <label for="node-input-name" class="l-width">Name</label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]placeholder.name">
@@ -11,32 +11,17 @@
         <label for="node-input-action">Action</label>
         <input type="text" id="node-input-action">
     </div>
-    <div class="form-row">
-        <label for="node-input-screen">Ecran</label>
-        <input type="number" id="node-input-screen">
-    </div>
 </script>
 
 <script type='text/javascript'>
 
-    const actionMapping = {
-        ThCmd: "Thermostat cible",
-        ThMeasureCmd: "Température thermostat mesurée",
-        IoCmd: "On/Off",
-        ShutterCmd: "Stop, Ouvrir/Fermer volet",
-        ShutterPos: "Position volet",
-        tempCmd: "Température mesurée",
-        humCmd: "Humiditée mesurée",
-        umCmd: "Luminositée mesurée",
-        IoBtn1Cmd: "Bouton 1 (On/Off)",
-        IoBtn2Cmd: "Bouton 2 (On/Off)",
-        IoBtn3Cmd: "Bouton 3 (On/Off)",
-        IoBtn4Cmd: "Bouton 4 (On/Off)",
-        SliderValueCmd: "Valeur jauge",
-        SliderBtnCmd: "Bouton jauge (On/Off)",
+    const configMapping = {
+        screenoff: "Turn on/off X-Display ",
+        verr: "Lock/Unlock X-Display ",
+        AutoOff: "Set X-Display sleep timer"
     }
 
-    RED.nodes.registerType('xdisplay-mqtt-out', {
+    RED.nodes.registerType('xdisplay-mqtt-display-config', {
         category: 'GCE X\u2013Display',
         color: '#80c600',
         icon: "font-awesome/fa-microchip",
@@ -49,28 +34,28 @@
                 required: true
             },
             action: { value:"screenoff"},
-            screen: {value:0, validate:RED.validators.number()}
         },
         inputs: 1,
         outputs: 0,
         // outputLabels: ["value"],
-        paletteLabel: 'Command',
+        paletteLabel: 'Config',
         label: function () {
+            var label = 'X\u2013Display config';
             if (this.name) {
-                return this.name;
+                label = this.name;
             } else if (this.action){
-                return actionMapping[this.action]
+                return configMapping[this.action]
             }
-            return 'X\u2013Display screen command';
+            return label;
         },
         oneditprepare: function() {
 			$("#node-input-action").typedInput({
 				types: [
 					{
-						value: "IoCmd",
-						options: Object.keys(actionMapping).map(key => ({
+						value: "screenoff",
+						options: Object.keys(configMapping).map(key => ({
                                     value: key,
-                                    label: actionMapping[key]
+                                    label: configMapping[key]
                                 }))
 					}
 				]

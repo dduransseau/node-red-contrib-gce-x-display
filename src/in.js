@@ -59,7 +59,7 @@ module.exports = function(RED) {
                 const screenNumber = splitedTopic[1]
                 const screenAction = splitedTopic[2]
                 // console.log("Received value for screen "+screenNumber+" action: "+screenAction+" with value: "+payload)
-                data.screenNumber = screenNumber
+                data.screenNumber = Number(screenNumber)
                 data.action = screenAction
                 if (screenAction == "ThState" || screenAction == "ThMeasureState" || screenAction == "temp"){
                     data.payload = Number(data.payload)

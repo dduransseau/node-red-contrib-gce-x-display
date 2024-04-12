@@ -19,7 +19,7 @@ module.exports = function(RED) {
                 console.log("No screen defined for type update, abort")
                 return
             }
-            node.broker.publish(screen+"updateName", msg.payload)
+            node.broker.publish(screen+"/updateName", msg.payload)
         });
     }
 	RED.nodes.registerType('xdisplay-mqtt-update-name', xDisplayMqttOut);

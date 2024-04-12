@@ -7,14 +7,12 @@
     "node-red": {
         "version": ">=2.1.0",
         "nodes": {
+            "gce-X-Display": "./src/gceXDisplay.js",
             "in": "./src/in.js",
             "out": "./src/out.js",
+            "display_config": "./src/display_config.js",
             "update_type": "./src/update_type.js",
-            "update_name": "./src/update_name.js",
-            "gateway": "./src/gateway.js"
+            "update_name": "./src/update_name.js"
         }
-    },
-    "dependencies": {
-        "mqtt": "^4.3.8"
     }
 }

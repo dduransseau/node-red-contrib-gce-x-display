@@ -42,7 +42,7 @@
                 value: ""
             },
             broker: {
-                type: "gateway",
+                type: "gce-X-Display",
                 required: true
             },
             screenType: { value:"1"},
@@ -66,19 +66,10 @@
 				types: [
 					{
 						value: "1",
-						options: [
-                            { value: "0", label: screenTypeMapping["0"]},
-							{ value: "1", label: screenTypeMapping["1"]},
-							{ value: "2", label: screenTypeMapping["2"]},
-							{ value: "3", label: screenTypeMapping["3"]},
-                            { value: "5", label: screenTypeMapping["5"]},
-							{ value: "6", label: screenTypeMapping["6"]},
-							{ value: "7", label: screenTypeMapping["7"]},
-                            { value: "8", label: screenTypeMapping["8"]},
-							{ value: "9", label: screenTypeMapping["9"]},
-                            { value: "10", label: screenTypeMapping["10"]},
-							{ value: "11", label: screenTypeMapping["11"]}
-						]
+						options: Object.keys(screenTypeMapping).map(key => ({
+                                    value: key,
+                                    label: screenTypeMapping[key]
+                                }))
 					}
 				]
 			})

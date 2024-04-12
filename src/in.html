@@ -19,7 +19,7 @@
                 value: ""
             },
             broker: {
-                type: "gateway",
+                type: "gce-X-Display",
                 required: true
             },
         },
@@ -28,11 +28,10 @@
         outputLabels: ["value"],
         paletteLabel: 'In',
         label: function () {
-            var label = 'X\u2013Display in';
             if (this.name) {
-                label = this.name;
+                return this.name;
             }
-            return label;
+            return 'X\u2013Display in';
         },
     });
 

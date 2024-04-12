@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    RED.nodes.registerType('gce-X-Display',{
+        category: 'config',
+        defaults: {
+            broker: {type:"mqtt-broker", required:true},
+            xDisplayCode: {value:"",required:true},
+            mqttQos : {value:0, validate:RED.validators.number()}
+        },
+        label: function() {
+            return "X-Display "+this.xDisplayCode;
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="gce-X-Display">
+    <div class="form-row">
+        <label for="node-config-input-broker" class="l-width">Broker</label>
+        <input type="text" id="node-config-input-broker">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-xDisplayCode"><i class="fa"></i>Code X-Display</label>
+        <input type="text" id="node-config-input-xDisplayCode">
+    </div>
+    <div class="form-row">
+        <label style="width: 90px" for="node-input-mqttQos">MQTT QoS</label>
+        <select id="node-config-input-mqttQos" style="width:75px">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select>
+    </div>
+</script>

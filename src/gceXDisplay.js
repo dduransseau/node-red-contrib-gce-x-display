@@ -2,48 +2,47 @@
 
 module.exports = function(RED) {
     "use strict";
-    var mqtt = require("mqtt");
-    class Gateway {
+    class XDisplay {
         constructor(n) {
             RED.nodes.createNode(this,n);
             var node = this;
             node.config = n;
-            node.host = n.host;
-            node.port = n.port;
-            node.xDisplayCode = n.xDisplayCode;
+            node.xDisplayCode = this.formatXDisplayCode(n.xDisplayCode);
             node.mqttQos = 1;
-
-            // node.log("Definition: "+JSON.stringify(eepDefinition))
+            node.brokerConn = RED.nodes.getNode(n.broker);
 
             //mqtt
-            node.mqtt = node.connectMQTT();
-            node.mqtt.on('connect', () => this.onMQTTConnect());
-            node.mqtt.on('message', (topic, message) => this.onMQTTMessage(topic, message));
+            if (node.brokerConn) {
+                node.brokerConn.register(node);
+                node.brokerConn.connect(node.onMQTTConnect());
+                node.client.on('connect', () => this.isConnected());
+                node.client.on('message', (topic, message) => this.onMQTTMessage(topic, message));
 
-            node.mqtt.on('close', () => this.onMQTTClose());
-            node.mqtt.on('end', () => this.onMQTTEnd());
-            node.mqtt.on('reconnect', () => this.onMQTTReconnect());
-            node.mqtt.on('offline', () => this.onMQTTOffline());
-            node.mqtt.on('disconnect', (error) => this.onMQTTDisconnect(error));
-            node.mqtt.on('error', (error) => this.onMQTTError(error));
+                node.client.on('close', () => this.onMQTTClose());
+                node.client.on('end', () => this.onMQTTEnd());
+                node.client.on('reconnect', () => this.onMQTTReconnect());
+                node.client.on('offline', () => this.onMQTTOffline());
+                node.client.on('disconnect', (error) => this.onMQTTDisconnect(error));
+                node.client.on('error', (error) => this.onMQTTError(error));
+            }
         }
 
+        formatXDisplayCode(code){
+            if (code.startsWith("0b")){
+                code = code.substring(2);
+            }
+            return code.toUpperCase();
+        }
 
-        connectMQTT(clientId = null) {
+        isConnected(){
             var node = this;
-            var options = {
-                port: node.config.port || 1883,
-                clientId: 'NodeRed-' + node.id + '-' + (clientId ? clientId : (Math.random() + 1).toString(36).substring(7)),
-            };
-
-            let baseUrl = 'mqtt://';
-
-            return mqtt.connect(baseUrl + node.config.host, options);
+            node.connection = true;
+            node.log('MQTT Connected');
         }
 
         subscribeMQTT() {
             var node = this;
-            node.mqtt.subscribe(node.getTopic('/#'), {'qos':parseInt(node.config.mqttQos||0)}, function(err) {
+            node.client.subscribe(node.getTopic('/#'), {'qos':parseInt(node.config.mqttQos||0)}, function(err) {
                 if (err) {
                     node.warn('MQTT Error: Subscribe to "' + node.getTopic('/#'));
                     node.emit('onConnectError', err);
@@ -56,17 +55,17 @@ module.exports = function(RED) {
         unsubscribeMQTT() {
             var node = this;
             node.log('MQTT Unsubscribe from mqtt topic: ' + node.getTopic('/#'));
-            node.mqtt.unsubscribe(node.getTopic('/#'), function(err) {});
+            node.client.unsubscribe(node.getTopic('/#'), function(err) {});
             node.devices_values = {};
         }
 
         publish(command, value){
             const topic = this.getTopic(command)
-            this.mqtt.publish(topic, value)
+            this.client.publish(topic, value)
         }
 
         getBaseTopic() {
-            return "x-display_" + this.config.xDisplayCode;
+            return "x-display_" + this.xDisplayCode;
         }
 
         getTopic(path) {
@@ -77,17 +76,11 @@ module.exports = function(RED) {
             }
         }
 
-        // nodeSend(node, opts) {
-        //     this.nodeSendSingle(node, opts)
-        // }
-
         onMQTTConnect() {
             var node = this;
-            node.connection = true;
-            node.log('MQTT Connected');
+            node.client = node.brokerConn.client;
             node.emit('onMQTTConnect');
             node.subscribeMQTT();
-
         }
 
         onMQTTDisconnect(error) {
@@ -95,7 +88,6 @@ module.exports = function(RED) {
             // node.connection = true;
             node.log('MQTT Disconnected');
             console.log(error);
-
         }
 
         onMQTTError(error) {
@@ -115,40 +107,30 @@ module.exports = function(RED) {
             var node = this;
             // node.connection = true;
             node.log('MQTT End');
-            // console.log();
-
         }
 
         onMQTTReconnect() {
             var node = this;
             // node.connection = true;
             node.log('MQTT Reconnect');
-            // console.log();
-
         }
 
         onMQTTClose() {
             var node = this;
             // node.connection = true;
             node.log('MQTT Close');
-            // console.log(node.connection);
-
         }
 
         onMQTTMessage(topic, message) {
             var node = this;
-            var messageString = message.toString();
-            var msg = {topic: topic, payload: messageString}
-            // console.log(topic);
-            // console.log(messageString);
-
-
-            try {
-                node.emit('onMQTTMessage', msg);
-            } catch (error){
-                if (error.name === "TypeError") {
-                    node.debug("Error to parse json message: "+error);
-                } else {
+            if (topic.startsWith(node.getBaseTopic())){
+                var messageString = message.toString();
+                var msg = {topic: topic, payload: messageString}
+                // console.log(topic);
+                // console.log(messageString);
+                try {
+                    node.emit('onMQTTMessage', msg);
+                } catch (error){
                     node.debug("Error to process message: "+error);
                 }
             }
@@ -157,12 +139,12 @@ module.exports = function(RED) {
         onClose() {
             var node = this;
             node.unsubscribeMQTT();
-            node.mqtt.end();
+            node.client.end();
             node.connection = false;
             node.emit('onClose');
             node.log('MQTT connection closed');
         }
 
     }
-	RED.nodes.registerType("gateway", Gateway);
+	RED.nodes.registerType("gce-X-Display", XDisplay);
 }
