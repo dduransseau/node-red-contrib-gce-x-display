@@ -106,7 +106,7 @@ module.exports = function(RED) {
             var node = this;
             // node.connection = true;
             node.log('MQTT Error');
-            console.log(error);j
+            console.log(error);
         }
 
         onMQTTOffline() {
