@@ -44,10 +44,10 @@ module.exports = function(RED) {
             var node = this;
             node.client.subscribe(node.getTopic('/temp'), {'qos':parseInt(node.config.mqttQos||0)}, function(err) {
                 if (err) {
-                    node.warn('MQTT Error: Subscribe to "' + node.getTopic('/#'));
+                    node.warn('MQTT Error: Subscribe to "' + node.getTopic('/temp'));
                     node.emit('onConnectError', err);
                 } else {
-                    node.log('MQTT Subscribed to: "' + node.getTopic('/#'));
+                    node.log('MQTT Subscribed to: "' + node.getTopic('/temp'));
                 }
             });
         }
@@ -92,7 +92,7 @@ module.exports = function(RED) {
             var node = this;
             node.client = node.brokerConn.client;
             node.emit('onMQTTConnect');
-            // node.subscribeMQTT();
+            node.subscribeMQTT();
         }
 
         onMQTTDisconnect(error) {
